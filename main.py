@@ -26,19 +26,29 @@ def main():
     system_message = SystemMessage(
         content="Você é um assistente técnico especializado em suporte."
     )
+    print("Agente iniciado. Digite 'sair' para encerrar.\n")
 
-    # Define a pergunta do usuário
-    user_message = HumanMessage(
-        content="Qual a função de um agente de IA?"
-    )
 
-    # Junta as mensagens em uma lista (estrutura de chat)
-    mensagens = [system_message, user_message]
+    while True:
+        # Captura a pergunta do usuário
+        user_input = input("Você: ")
 
-    resposta = llm.invoke(mensagens)
+        # Condição de saída do programa
+        if user_input.lower() in ["sair", "exit", "quit"]:
+            print("Encerrando agente.")
+            break
 
-    print("\nResposta do agente:\n")
-    print(resposta.content)
+        # Cria a mensagem do usuário
+        user_message = HumanMessage(content=user_input)
+
+        # Monta a lista de mensagens enviada ao modelo
+        mensagens = [system_message, user_message]
+
+        # Invoca o modelo com as mensagens estruturadas
+        resposta = llm.invoke(mensagens)
+
+        # Exibe a resposta do agente
+        print(f"\nAgente: {resposta.content}\n")
 
 
 if __name__ == "__main__":
