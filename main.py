@@ -8,7 +8,6 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from tools import consultar_status_servico
 
 
-
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
@@ -22,11 +21,17 @@ if not api_key:
 # Lista de tools disponíveis
 tools = [consultar_status_servico]
 
+# Mapeia o nome da tool para a função correspondente
+tool_map = {
+    consultar_status_servico.name: consultar_status_servico
+}
+
+# Inicializa o modelo de linguagem
 llm = ChatOpenAI(
-    model="gpt-4o-mini", 
-    temperature=0, 
+    model="gpt-4o-mini",
+    temperature=0,
     api_key=api_key
-    )
+)
 
 # Vincula as tools ao modelo
 llm_with_tools = llm.bind_tools(tools=tools)
@@ -41,8 +46,8 @@ def main():
             "utilize a tool disponível."
         )
     )
-    print("Agente iniciado. Digite 'sair' para encerrar.\n")
 
+    print("Agente iniciado. Digite 'sair' para encerrar.\n")
 
     while True:
         # Captura a pergunta do usuário
@@ -62,10 +67,33 @@ def main():
         # Invoca o modelo com suporte a tools
         resposta = llm_with_tools.invoke(mensagens)
 
-        # Exibe a resposta bruta do modelo
-        print("\nResposta do agente:")
-        print(resposta)
-        print()
+        # Verifica se o modelo decidiu usar alguma tool
+        if resposta.tool_calls:
+            # Captura a primeira tool chamada pelo modelo
+            tool_call = resposta.tool_calls[0]
 
+            # Extrai o nome da tool e seus argumentos
+            tool_name = tool_call["name"]
+            tool_args = tool_call["args"]
+
+            # Seleciona a função correspondente no mapa de tools
+            selected_tool = tool_map[tool_name]
+
+            # Executa a tool com os argumentos recebidos
+            resultado_tool = selected_tool.invoke(tool_args)
+
+            # Exibe o resultado da tool para o usuário
+            print("\nAgente:")
+            print(resultado_tool)
+            print()
+
+        else:
+            # Caso o modelo não use tool, exibe a resposta normal
+            print("\nAgente:")
+            print(resposta.content)
+            print()
+
+
+# Ponto de entrada do programa
 if __name__ == "__main__":
     main()
