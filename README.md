@@ -1,41 +1,74 @@
-# 🤖 Agent Support with LangGraph
+# 🤖 Agent Support com LangGraph
 
-Projeto de agente conversacional utilizando **LangGraph**, **LangChain**
-e **OpenAI**, com execução em terminal e suporte a ferramentas (tools) e
-memória simples de contexto.
+> Um agente conversacional inteligente construído com **LangGraph +
+> LangChain + OpenAI**, capaz de tomar decisões, executar ferramentas e
+> manter contexto de conversa --- simulando arquiteturas reais de
+> agentes modernos.
 
 ------------------------------------------------------------------------
 
 ## 🚀 Visão Geral
 
-Este projeto implementa um agente inteligente baseado em grafos de
-estado (**StateGraph**) que:
+Este projeto implementa um agente baseado em **StateGraph (LangGraph)**
+que:
 
--   Processa mensagens do usuário
--   Decide dinamicamente quando utilizar ferramentas
--   Executa funções externas (tools)
+-   Interpreta mensagens do usuário
+-   Decide dinamicamente quando usar ferramentas (tools)
+-   Executa funções externas
 -   Mantém histórico da conversa (memória simples)
--   Retorna respostas contextualizadas
+-   Responde de forma contextual e iterativa
+
+👉 O objetivo é simular um **agente real de produção**, com fluxo
+controlado, separação de responsabilidades e arquitetura escalável.
 
 ------------------------------------------------------------------------
 
-## 🧠 Arquitetura
+## 🧠 Arquitetura do Agente
 
-O fluxo do agente é estruturado com LangGraph:
+    User Input
+        ↓
+    [ Agent Node ]
+        ↓ (decisão)
+     ┌───────────────┐
+     │               │
+     ▼               ▼
+    END         [ Tools Node ]
+                    ↓
+               [ Agent Node ]
 
-    User Input → Agent Node → (Decision)
-                            ↘ Tools Node → Agent Node → Final Response
+------------------------------------------------------------------------
 
-### Componentes principais:
+### 🔹 Componentes principais
 
--   **Agent Node**
-    -   Responsável por interpretar o contexto e decidir ações
--   **Tools Node**
-    -   Executa ferramentas externas quando solicitado
--   **State (messages)**
-    -   Mantém o histórico da conversa
--   **Conditional Edges**
-    -   Controla o fluxo entre agent e tools
+#### 1. Agent Node
+
+Responsável por interpretar o contexto, decidir ações e gerar respostas.
+
+#### 2. Tools Node
+
+Executa funções externas e retorna resultados estruturados
+(`ToolMessage`).
+
+#### 3. Estado (State)
+
+``` python
+messages: List[BaseMessage]
+```
+
+Armazena todo o histórico da conversa.
+
+#### 4. Controle de fluxo
+
+-   `should_continue()` decide o próximo passo
+-   Permite loop entre agente ↔ tools
+
+------------------------------------------------------------------------
+
+## 🧠 Memória do Agente
+
+-   Histórico contínuo da conversa
+-   Contexto preservado entre interações
+-   Armazenamento em memória (in-memory)
 
 ------------------------------------------------------------------------
 
@@ -45,100 +78,78 @@ O fluxo do agente é estruturado com LangGraph:
 -   LangChain
 -   LangGraph
 -   OpenAI API
--   UV (gerenciamento de dependências)
+-   UV
 -   dotenv
 
 ------------------------------------------------------------------------
 
-## 💾 Memória do Agente
+## ⚙️ Como Executar
 
-O agente mantém uma memória simples durante a execução:
-
--   Histórico contínuo da conversa
--   Contexto preservado entre interações
--   Sem uso de banco externo (in-memory)
-
-------------------------------------------------------------------------
-
-## ▶️ Como Executar
-
-### 1. Clonar o repositório
+### 1. Clone o repositório
 
     git clone https://github.com/MarcioLuizBR/agent-support-langgraph.git
     cd agent-support-langgraph
 
-### 2. Criar ambiente com UV
+### 2. Ambiente com UV
 
     uv venv
     uv pip install -r requirements.txt
 
-### 3. Configurar variáveis de ambiente
-
-Crie um arquivo `.env`:
+### 3. .env
 
     OPENAI_API_KEY=your_api_key_here
 
-### 4. Executar o projeto
+### 4. Executar
 
     python main.py
 
 ------------------------------------------------------------------------
 
-## 💬 Exemplo de Uso
+## 💬 Exemplo
 
-    Você: Qual o status do serviço X?
-    Agente: O serviço X está operacional.
-
-O agente decide automaticamente quando usar tools.
+    Você: Meu nome é Márcio
+    Você: Qual é o meu nome?
+    Você: Consulte o status do serviço X
 
 ------------------------------------------------------------------------
 
-## 📦 Estrutura do Projeto
+## 📂 Estrutura
 
     ├── main.py
     ├── tools.py
     ├── pyproject.toml
     ├── uv.lock
-    ├── .env
     └── README.md
 
 ------------------------------------------------------------------------
 
-## 🎯 Objetivo do Projeto
+## 🎯 Objetivo
 
-Este projeto faz parte de um portfólio focado em:
+Projeto focado em:
 
--   Agentes inteligentes
--   Arquiteturas com LLMs
--   Integração de tools
--   Engenharia de contexto
--   Aplicações reais com LangGraph
+-   Agent Engineering
+-   LLMs na prática
+-   Arquiteturas com LangGraph
 
 ------------------------------------------------------------------------
 
-## 📈 Próximos Passos
+## 📈 Próximos passos
 
--   Logs estruturados do fluxo do agente
--   Persistência de memória (arquivo ou banco)
--   Interface web (FastAPI ou Streamlit)
--   Deploy em ambiente cloud
-
-------------------------------------------------------------------------
-
-## 🤝 Contribuição
-
-Sinta-se à vontade para abrir issues ou contribuir com melhorias.
+-   Logs do agente
+-   Persistência de memória
+-   API com FastAPI
+-   Deploy cloud
 
 ------------------------------------------------------------------------
 
 ## 👤 Autor
 
-**Márcio Luiz**\
-[GitHub](https://github.com/MarcioLuizBR)\
-[LinkedIn](https://www.linkedin.com/in/marcio-luiz/)
+Márcio Luiz\
+https://github.com/MarcioLuizBR\
+https://www.linkedin.com/in/marcio-luiz/
 
 ------------------------------------------------------------------------
 
-## ⭐ Se este projeto te ajudou
+## ⭐
 
-Considere deixar uma estrela ⭐ no repositório!
+Se ajudou, deixa uma estrela!
