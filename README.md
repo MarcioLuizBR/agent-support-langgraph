@@ -148,7 +148,7 @@ Integração com ferramentas - Controle de fluxo com grafos
 ## 👤 Autor
 
 Márcio Luiz\
-GitHub: https://github.com/MarcioLuizBR\
+GitHub: https://github.com/MarcioLuizBR/
 LinkedIn: https://www.linkedin.com/in/marcioluiz-br/
 
 ------------------------------------------------------------------------
