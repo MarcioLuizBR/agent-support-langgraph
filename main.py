@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
+# Importa a tool criada no arquivo tools.py
+from tools import consultar_status_servico
+
+
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -15,16 +19,27 @@ api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("A variável OPENAI_API_KEY não foi encontrada no arquivo .env")
 
+# Lista de tools disponíveis
+tools = [consultar_status_servico]
+
 llm = ChatOpenAI(
     model="gpt-4o-mini", 
     temperature=0, 
     api_key=api_key
     )
 
+# Vincula as tools ao modelo
+llm_with_tools = llm.bind_tools(tools=tools)
+
+
 def main():
     # Define o contexto do agente (comportamento)
     system_message = SystemMessage(
-        content="Você é um assistente técnico especializado em suporte."
+        content=(
+            "Você é um assistente técnico especializado em suporte. "
+            "Quando o usuário perguntar sobre o status de um serviço, "
+            "utilize a tool disponível."
+        )
     )
     print("Agente iniciado. Digite 'sair' para encerrar.\n")
 
@@ -44,12 +59,13 @@ def main():
         # Monta a lista de mensagens enviada ao modelo
         mensagens = [system_message, user_message]
 
-        # Invoca o modelo com as mensagens estruturadas
-        resposta = llm.invoke(mensagens)
+        # Invoca o modelo com suporte a tools
+        resposta = llm_with_tools.invoke(mensagens)
 
-        # Exibe a resposta do agente
-        print(f"\nAgente: {resposta.content}\n")
-
+        # Exibe a resposta bruta do modelo
+        print("\nResposta do agente:")
+        print(resposta)
+        print()
 
 if __name__ == "__main__":
     main()
