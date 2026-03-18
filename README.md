@@ -1,34 +1,33 @@
 # 🤖 Agent Support com LangGraph
 
-> Um agente conversacional inteligente construído com **LangGraph +
-> LangChain + OpenAI**, capaz de tomar decisões, executar ferramentas e
-> manter contexto de conversa --- simulando arquiteturas reais de
-> agentes modernos.
+> Agente conversacional com **LangGraph + LangChain + OpenAI**, com
+> tomada de decisão, execução de ferramentas e memória de contexto ---
+> arquitetura pronta para evoluir para produção.
 
 ------------------------------------------------------------------------
 
 ## 🚀 Visão Geral
 
-Este projeto implementa um agente baseado em **StateGraph (LangGraph)**
-que:
+Este projeto demonstra uma arquitetura moderna de **Agent Engineering**
+usando **StateGraph (LangGraph)** para orquestrar:
 
--   Interpreta mensagens do usuário
--   Decide dinamicamente quando usar ferramentas (tools)
--   Executa funções externas
--   Mantém histórico da conversa (memória simples)
--   Responde de forma contextual e iterativa
+-   Interpretação de mensagens do usuário
+-   Decisão de uso de ferramentas (tool calling)
+-   Execução de funções externas
+-   Loop de raciocínio (agent ↔ tools)
+-   Memória de sessão (histórico contínuo)
 
-👉 O objetivo é simular um **agente real de produção**, com fluxo
-controlado, separação de responsabilidades e arquitetura escalável.
+💡 Objetivo: sair do "chat simples" e construir um **agente
+estruturado**, com separação de responsabilidades e fluxo controlado.
 
 ------------------------------------------------------------------------
 
-## 🧠 Arquitetura do Agente
+## 🧠 Arquitetura (StateGraph)
 
     User Input
         ↓
     [ Agent Node ]
-        ↓ (decisão)
+        ↓ (decision: tools?)
      ┌───────────────┐
      │               │
      ▼               ▼
@@ -36,70 +35,60 @@ controlado, separação de responsabilidades e arquitetura escalável.
                     ↓
                [ Agent Node ]
 
-------------------------------------------------------------------------
+### Componentes
 
-### 🔹 Componentes principais
-
-#### 1. Agent Node
-
-Responsável por interpretar o contexto, decidir ações e gerar respostas.
-
-#### 2. Tools Node
-
-Executa funções externas e retorna resultados estruturados
-(`ToolMessage`).
-
-#### 3. Estado (State)
-
-``` python
-messages: List[BaseMessage]
-```
-
-Armazena todo o histórico da conversa.
-
-#### 4. Controle de fluxo
-
--   `should_continue()` decide o próximo passo
--   Permite loop entre agente ↔ tools
+-   **Agent Node**
+    -   LLM + contexto
+    -   Decide ações e quando chamar tools
+-   **Tools Node**
+    -   Executa funções externas
+    -   Retorna `ToolMessage`
+-   **State (messages)**
+    -   Histórico completo da conversa
+-   **Conditional Edge**
+    -   Controla o fluxo (continua ou encerra)
 
 ------------------------------------------------------------------------
 
-## 🧠 Memória do Agente
+## 🧠 Memória (Session Memory)
 
--   Histórico contínuo da conversa
--   Contexto preservado entre interações
--   Armazenamento em memória (in-memory)
+-   Histórico contínuo durante a execução
+-   Preserva contexto entre interações
+-   Implementação simples (in-memory)
+-   Sem banco externo (ideal para MVP)
 
 ------------------------------------------------------------------------
 
-## 🛠️ Tecnologias Utilizadas
+## 🔧 Tecnologias
 
 -   Python
 -   LangChain
 -   LangGraph
 -   OpenAI API
--   UV
--   dotenv
+-   UV (dependency management)
+-   python-dotenv
 
 ------------------------------------------------------------------------
 
-## ⚙️ Como Executar
+## ⚙️ Como Rodar
 
-### 1. Clone o repositório
+### 1) Clone
 
     git clone https://github.com/MarcioLuizBR/agent-support-langgraph.git
     cd agent-support-langgraph
 
-### 2. Ambiente com UV
+### 2) Ambiente (UV)
 
     uv venv
     uv pip install -r requirements.txt
 
-### 3. .env
+### 3) Variáveis de ambiente
+
+Crie `.env`:
 
     OPENAI_API_KEY=your_api_key_here
 
-### 4. Executar
+### 4) Executar
 
     python main.py
 
@@ -108,48 +97,62 @@ Armazena todo o histórico da conversa.
 ## 💬 Exemplo
 
     Você: Meu nome é Márcio
+    Agente: Prazer, Márcio!
+
     Você: Qual é o meu nome?
+    Agente: Seu nome é Márcio.
+
     Você: Consulte o status do serviço X
+    Agente: O serviço X está operacional.
 
 ------------------------------------------------------------------------
 
-## 📂 Estrutura
+## 🧩 Estrutura
 
-    ├── main.py
-    ├── tools.py
-    ├── pyproject.toml
-    ├── uv.lock
+    ├── main.py              # Orquestração do grafo + loop CLI
+    ├── tools.py             # Definição das tools
+    ├── pyproject.toml       # Config do projeto
+    ├── uv.lock              # Lock de dependências
     └── README.md
 
 ------------------------------------------------------------------------
 
-## 🎯 Objetivo
+## ⭐ Diferenciais
 
-Projeto focado em:
-
--   Agent Engineering
--   LLMs na prática
--   Arquiteturas com LangGraph
+-   Uso real de **LangGraph (StateGraph)**
+-   **Tool calling** com retorno estruturado
+-   Loop agent ↔ tools
+-   **Memória de contexto** funcional
+-   Base pronta para evolução (logs, API, persistência)
 
 ------------------------------------------------------------------------
 
-## 📈 Próximos passos
+## 📈 Roadmap
 
--   Logs do agente
--   Persistência de memória
--   API com FastAPI
--   Deploy cloud
+-   [ ] Logs estruturados do fluxo
+-   [ ] Persistência de memória (arquivo / DB / vector store)
+-   [ ] API (FastAPI)
+-   [ ] UI (Streamlit)
+-   [ ] Deploy (Azure/AWS)
+-   [ ] Observabilidade
+
+------------------------------------------------------------------------
+
+## 🎯 Propósito
+
+Portfólio focado em: - Agent Engineering - Arquiteturas com LLMs -
+Integração com ferramentas - Controle de fluxo com grafos
 
 ------------------------------------------------------------------------
 
 ## 👤 Autor
 
 Márcio Luiz\
-https://github.com/MarcioLuizBR\
-https://www.linkedin.com/in/marcio-luiz/
+GitHub: https://github.com/MarcioLuizBR\
+LinkedIn: https://www.linkedin.com/in/marcioluiz-br/
 
 ------------------------------------------------------------------------
 
-## ⭐
+## 🙌 Se te ajudou
 
-Se ajudou, deixa uma estrela!
+Deixe uma ⭐ no repositório!
