@@ -11,7 +11,7 @@ from langchain_core.messages import (
     SystemMessage,
     HumanMessage,
     ToolMessage,
-    BaseMessage
+    BaseMessage,
 )
 
 # Importa utilitário para acumular mensagens no estado
@@ -33,6 +33,7 @@ api_key = os.getenv("OPENAI_API_KEY")
 # Validação simples para garantir que a chave existe
 if not api_key:
     raise ValueError("A variável OPENAI_API_KEY não foi encontrada no arquivo .env")
+
 
 # Lista de tools disponíveis
 tools = [consultar_status_servico]
@@ -94,8 +95,8 @@ def should_continue(state: AgentState) -> str:
 
 def tools_node(state: AgentState) -> AgentState:
     """
-    Executa as tools solicitadas pelo modelo e devolve os resultados
-    como ToolMessage para o estado.
+    Executa as tools solicitadas pelo modelo
+    e devolve os resultados como ToolMessage para o estado.
     """
     last_message = state["messages"][-1]
     tool_messages = []
@@ -153,7 +154,11 @@ def main():
     # Compila o app do LangGraph
     app = build_graph()
 
-    print("Agente com LangGraph iniciado. Digite 'sair' para encerrar.\n")
+    # Histórico contínuo da conversa durante a execução do programa
+    conversation_history = []
+
+    print("Agente com memória simples iniciado.")
+    print("Digite 'sair' para encerrar.\n")
 
     while True:
         # Captura a entrada do usuário
@@ -164,16 +169,19 @@ def main():
             print("Encerrando agente.")
             break
 
-        # Inicia o estado com a mensagem do usuário
-        initial_state = {
-            "messages": [HumanMessage(content=user_input)]
-        }
+        # Adiciona a nova pergunta do usuário ao histórico acumulado
+        conversation_history.append(HumanMessage(content=user_input))
 
-        # Executa o grafo
-        result = app.invoke(initial_state)
+        # Executa o grafo com TODO o histórico da conversa
+        result = app.invoke({
+            "messages": conversation_history
+        })
+
+        # Atualiza o histórico com o estado retornado pelo grafo
+        conversation_history = result["messages"]
 
         # Obtém a última mensagem gerada
-        final_message = result["messages"][-1]
+        final_message = conversation_history[-1]
 
         print("\nAgente:")
         print(final_message.content)
