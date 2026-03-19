@@ -1,4 +1,3 @@
-# Importa o decorator para transformar uma função em tool
 from langchain_core.tools import tool
 
 
@@ -6,10 +5,11 @@ from langchain_core.tools import tool
 def consultar_status_servico(servico: str) -> str:
     """
     Consulta o status de um serviço interno.
+
     Use esta tool quando o usuário perguntar sobre o status de algum serviço.
     """
 
-    # Base simulada de status dos serviços, fake para fins de demonstração
+    # Base simulada de status dos serviços (mock)
     status_fake = {
         "api": "A API principal está estável e sem incidentes no momento.",
         "banco de dados": "O banco de dados está operacional e com desempenho normal.",
@@ -17,11 +17,17 @@ def consultar_status_servico(servico: str) -> str:
         "servidor": "O servidor está online, sem alertas críticos."
     }
 
-    # Padroniza o texto recebido
+    # Normaliza entrada (remove espaços e padroniza caixa)
     servico_normalizado = servico.strip().lower()
 
-    # Retorna o status encontrado ou uma mensagem padrão
-    return status_fake.get(
-        servico_normalizado,
-        f"Não encontrei informações sobre o serviço '{servico}'."
+    # Caso o serviço exista
+    if servico_normalizado in status_fake:
+        return status_fake[servico_normalizado]
+
+    # Caso não exista → resposta mais inteligente
+    servicos_disponiveis = ", ".join(status_fake.keys())
+
+    return (
+        f"Não encontrei informações sobre o serviço '{servico}'. "
+        f"Serviços disponíveis: {servicos_disponiveis}."
     )
