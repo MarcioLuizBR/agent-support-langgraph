@@ -1,158 +1,204 @@
 # 🤖 Agent Support com LangGraph
 
-> Agente conversacional com **LangGraph + LangChain + OpenAI**, com
-> tomada de decisão, execução de ferramentas e memória de contexto ---
-> arquitetura pronta para evoluir para produção.
+> Agente conversacional com **LangGraph + LangChain + OpenAI**, com controle de fluxo, execução de tools, memória de sessão e observabilidade via logs.  
+>  
+> Projeto estruturado com foco em **Agent Engineering** e pronto para evoluções reais (API, persistência, UI e deploy).
 
-------------------------------------------------------------------------
+---
 
 ## 🚀 Visão Geral
 
-Este projeto demonstra uma arquitetura moderna de **Agent Engineering**
-usando **StateGraph (LangGraph)** para orquestrar:
+Este projeto demonstra a construção de um **agente baseado em grafos (LangGraph)**, indo além de um chat simples.
 
--   Interpretação de mensagens do usuário
--   Decisão de uso de ferramentas (tool calling)
--   Execução de funções externas
--   Loop de raciocínio (agent ↔ tools)
--   Memória de sessão (histórico contínuo)
+A arquitetura implementa:
 
-💡 Objetivo: sair do "chat simples" e construir um **agente
-estruturado**, com separação de responsabilidades e fluxo controlado.
+- Orquestração de fluxo com `StateGraph`
+- Decisão dinâmica de uso de ferramentas (tool calling)
+- Execução de funções externas
+- Loop de raciocínio (agent ↔ tools)
+- Memória de sessão (histórico contínuo)
+- Logs estruturados para rastreabilidade
 
-------------------------------------------------------------------------
+💡 O objetivo é simular um **agente de suporte técnico**, com comportamento controlado e extensível.
 
-## 🧠 Arquitetura (StateGraph)
+---
 
-    User Input
-        ↓
-    [ Agent Node ]
-        ↓ (decision: tools?)
-     ┌───────────────┐
-     │               │
-     ▼               ▼
-    END         [ Tools Node ]
-                    ↓
-               [ Agent Node ]
+## 🧠 Arquitetura do Agente
 
-### Componentes
+```text
+User Input
+    ↓
+[ Agent Node ]
+    ↓ (decisão)
+ ┌───────────────┐
+ │               │
+ ▼               ▼
+END         [ Tools Node ]
+                ↓
+           [ Agent Node ]
+```
 
--   **Agent Node**
-    -   LLM + contexto
-    -   Decide ações e quando chamar tools
--   **Tools Node**
-    -   Executa funções externas
-    -   Retorna `ToolMessage`
--   **State (messages)**
-    -   Histórico completo da conversa
--   **Conditional Edge**
-    -   Controla o fluxo (continua ou encerra)
+### 🔹 Componentes principais
 
-------------------------------------------------------------------------
+**Agent Node**
+- Interage com o modelo LLM
+- Recebe histórico completo
+- Decide quando usar tools
 
-## 🧠 Memória (Session Memory)
+**Tools Node**
+- Executa funções externas
+- Retorna `ToolMessage` para o fluxo
 
--   Histórico contínuo durante a execução
--   Preserva contexto entre interações
--   Implementação simples (in-memory)
--   Sem banco externo (ideal para MVP)
+**State (messages)**
+- Armazena todo o histórico da conversa
+- Base da memória do agente
 
-------------------------------------------------------------------------
+**Conditional Edge**
+- Controla o fluxo entre agent → tools → agent ou finalização
+
+---
+
+## 🧠 Memória de Sessão
+
+- Histórico contínuo durante a execução
+- Preserva contexto entre interações
+- Implementação em memória (in-memory)
+- Sem dependência de banco externo
+
+👉 Ideal para MVP e evolução incremental
+
+---
+
+## 📊 Observabilidade (Logs)
+
+O agente possui logs estruturados no terminal:
+
+- Entrada no agent node
+- Decisão de fluxo
+- Execução de tools
+- Argumentos utilizados
+- Resultado das tools
+
+👉 Facilita debug, entendimento do fluxo e evolução do sistema
+
+---
 
 ## 🔧 Tecnologias
 
--   Python
--   LangChain
--   LangGraph
--   OpenAI API
--   UV (dependency management)
--   python-dotenv
+- Python
+- LangChain
+- LangGraph
+- OpenAI API
+- UV (dependency management)
+- python-dotenv
 
-------------------------------------------------------------------------
+---
 
 ## ⚙️ Como Rodar
 
-### 1) Clone
+### 1) Clone o repositório
 
-    git clone https://github.com/MarcioLuizBR/agent-support-langgraph.git
-    cd agent-support-langgraph
+```bash
+git clone https://github.com/MarcioLuizBR/agent-support-langgraph.git
+cd agent-support-langgraph
+```
 
-### 2) Ambiente (UV)
+### 2) Ambiente virtual (UV)
 
-    uv venv
-    uv pip install -r requirements.txt
+```bash
+uv venv
+uv pip install -r requirements.txt
+```
 
 ### 3) Variáveis de ambiente
 
-Crie `.env`:
+Crie um arquivo `.env`:
 
-    OPENAI_API_KEY=your_api_key_here
+```env
+OPENAI_API_KEY=your_api_key_here
+```
 
-### 4) Executar
+### 4) Executar o agente
 
-    python main.py
+```bash
+python main.py
+```
 
-------------------------------------------------------------------------
+---
 
-## 💬 Exemplo
+## 💬 Exemplos de Uso
 
-    Você: Meu nome é Márcio
-    Agente: Prazer, Márcio!
+```text
+Você: Meu nome é Márcio
+Agente: Prazer, Márcio!
 
-    Você: Qual é o meu nome?
-    Agente: Seu nome é Márcio.
+Você: Qual é o meu nome?
+Agente: Seu nome é Márcio.
 
-    Você: Consulte o status do serviço X
-    Agente: O serviço X está operacional.
+Você: Qual o status do serviço api?
+Agente: A API principal está estável e sem incidentes no momento.
+```
 
-------------------------------------------------------------------------
+---
 
-## 🧩 Estrutura
+## 🧩 Estrutura do Projeto
 
-    ├── main.py              # Orquestração do grafo + loop CLI
-    ├── tools.py             # Definição das tools
-    ├── pyproject.toml       # Config do projeto
-    ├── uv.lock              # Lock de dependências
-    └── README.md
+```text
+├── main.py              # Orquestração do grafo + loop CLI
+├── tools.py             # Definição das tools
+├── pyproject.toml       # Configuração do projeto
+├── uv.lock              # Lock de dependências
+└── README.md
+```
 
-------------------------------------------------------------------------
+---
 
 ## ⭐ Diferenciais
 
--   Uso real de **LangGraph (StateGraph)**
--   **Tool calling** com retorno estruturado
--   Loop agent ↔ tools
--   **Memória de contexto** funcional
--   Base pronta para evolução (logs, API, persistência)
+- Uso real de **LangGraph (StateGraph)**
+- Arquitetura baseada em fluxo (graph-based agent)
+- Execução dinâmica de tools (tool calling)
+- Loop agent ↔ tools
+- Memória de contexto funcional
+- Logs estruturados (observabilidade)
+- Base pronta para evolução para produção
 
-------------------------------------------------------------------------
+---
 
 ## 📈 Roadmap
 
--   [ ] Logs estruturados do fluxo
--   [ ] Persistência de memória (arquivo / DB / vector store)
--   [ ] API (FastAPI)
--   [ ] UI (Streamlit)
--   [ ] Deploy (Azure/AWS)
--   [ ] Observabilidade
+- [x] Memória de sessão
+- [x] Logs estruturados
+- [ ] Persistência de memória (arquivo / DB / vector store)
+- [ ] API (FastAPI)
+- [ ] Interface web (Streamlit)
+- [ ] Deploy (Azure / AWS)
+- [ ] Monitoramento e tracing
 
-------------------------------------------------------------------------
+---
 
 ## 🎯 Propósito
 
-Portfólio focado em: - Agent Engineering - Arquiteturas com LLMs -
-Integração com ferramentas - Controle de fluxo com grafos
+Projeto desenvolvido como parte de portfólio com foco em:
 
-------------------------------------------------------------------------
+- Agent Engineering
+- Arquiteturas com LLMs
+- Integração com ferramentas externas
+- Controle de fluxo com grafos (LangGraph)
+
+---
 
 ## 👤 Autor
 
-Márcio Luiz\
-GitHub: https://github.com/MarcioLuizBR/
-LinkedIn: https://www.linkedin.com/in/marcioluiz-br/
+**Márcio Luiz**
 
-------------------------------------------------------------------------
+- GitHub: https://github.com/MarcioLuizBR  
+- LinkedIn: https://www.linkedin.com/in/marcioluiz-br/
 
-## 🙌 Se te ajudou
+---
 
-Deixe uma ⭐ no repositório!
+## 🙌 Contribuição
+
+Se este projeto te ajudou, considere deixar uma ⭐ no repositório.
+
+---
